@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   shellcheck:
     name: Shell Linting
-    runs-on: [innersource.prod.amr.dind]
+    runs-on: [ubuntu-latest]
     container: ubuntu:24.04
 
     steps:

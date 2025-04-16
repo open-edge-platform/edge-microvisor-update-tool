@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   run_ab_update_tool_tests:
     name: Running AB Update Tool Tests
-    runs-on: ["innersource.prod.amr.dind"]
+    runs-on: [ubuntu-latest]
     container: amr-registry-pre.caas.intel.com/python-unit-testing/python310-ci:1.0.1
     steps:
       - name: Checkout Code
