@@ -1,0 +1,27 @@
+name: Lint Shell Scripts
+
+on: [push, pull_request]
+
+jobs:
+  shellcheck:
+    name: Shell Linting
+    runs-on: [innersource.prod.amr.dind]
+    container: ubuntu:24.04
+
+    steps:
+      - name: Setup required tooling
+        run: |
+          apt update
+          apt install -y shellcheck
+
+      # Checkout the branch of our repo that triggered this action
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Find and lint .sh files
+        run: |
+          echo "Running shellcheck on the following files:"
+          find . -name '*.sh'
+          find . -name '*.sh' -exec shellcheck -x {} +
