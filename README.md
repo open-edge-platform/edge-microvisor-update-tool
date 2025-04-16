@@ -1,7 +1,7 @@
 # AB OS Update Tool
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![Lint Status](https://https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/lint-sh.yml/badge.svg)](https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/lint-sh.yml)
-[![Unit Test Status](https://https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/unit-test.yml/badge.svg)](https://[github.com/intel-innersource/os.linux.tiberos.ab-update](https://github.com/open-edge-platform/edge-microvisor-update-tool)/actions/workflows/unit-test.yml)
+[![Lint Status](https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/lint-sh.yml/badge.svg)](https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/lint-sh.yml)
+[![Unit Test Status](https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/unit-test.yml/badge.svg)](https://[github.com/intel-innersource/os.linux.tiberos.ab-update](https://github.com/open-edge-platform/edge-microvisor-update-tool)/actions/workflows/unit-test.yml)
 
 The OS Update Tool (UT) is a utility used by INMB/PUA agents for Day 2 operations. UT provides interfaces to assist INMB/PUA agents in performing OS image A/B swaps. Its functionalities include OS image downloading, flashing to an alternate partition, and updating the next boot configuration.
 
