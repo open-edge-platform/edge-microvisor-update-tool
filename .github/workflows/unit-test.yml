@@ -6,7 +6,8 @@ jobs:
   run_ab_update_tool_tests:
     name: Running AB Update Tool Tests
     runs-on: [ubuntu-latest]
-    container: amr-registry-pre.caas.intel.com/python-unit-testing/python310-ci:1.0.1
+    container:
+      image: python:3.10
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
