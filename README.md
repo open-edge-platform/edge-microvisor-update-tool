@@ -85,3 +85,7 @@ sudo ./os-update-tool.sh -w -u /mnt/tiber-readonly-1.0.20240920.1734.raw.xz -s e
 ## License Information
 
 Edge Microvisor Update Tool is open source and licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.
+
+## Contributing
+
+As an open-source project, Edge Microvisor Update Tool always looks for community-driven improvements. If you are interested in making the product even better, see how you can help in the [contribution guide](./CONTRIBUTING.md).
