@@ -1,0 +1,60 @@
+name: Run AB Update Tool Tests
+
+on: [push, pull_request]
+
+jobs:
+  run_ab_update_tool_tests:
+    name: Running AB Update Tool Tests
+    runs-on: ["innersource.prod.amr.dind"]
+    container: amr-registry-pre.caas.intel.com/python-unit-testing/python310-ci:1.0.1
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Update Package Manager and Install Required Tools
+        run: |
+          apt-get update
+          apt-get install -y sudo fdisk cryptsetup systemd-boot
+          if ! command -v sfdisk > /dev/null; then
+            echo "sfdisk is not found. Installation failed."
+            exit 1
+          fi
+          if ! command -v cryptsetup > /dev/null; then
+            echo "cryptsetup is not found. Installation failed."
+            exit 1
+          fi
+          if ! command -v bootctl > /dev/null; then
+            echo "bootctl is not found. Installation failed."
+            exit 1
+          fi
+
+      - name: List Installed Tools
+        run: |
+          echo "Verifying installation..."
+          sfdisk --version || echo "sfdisk is not installed!"
+          cryptsetup --version || echo "cryptsetup is not installed!"
+          bootctl --version || echo "bootctl is not installed!"
+
+      - name: Run check version info unit test
+        run: sudo python3 ./tests/test_check_version.py
+
+      - name: Run Fuzz Test
+        run: python3 ./tests/fuzz_test.py
+
+      - name: Run Invalid gzip unit test
+        run: sudo python3 ./tests/test_invalid_gzip.py
+
+      - name: Run Invalid apply unit test
+        run: sudo python3 ./tests/test_invalid_apply.py
+
+      - name: Run Invalid commit unit test
+        run: sudo python3 ./tests/test_invalid_commit.py
+
+      - name: Run Invalid rollback unit test
+        run: sudo python3 ./tests/test_invalid_rollback.py
+
+      - name: Run Parallel execution unit test
+        run: sudo python3 ./tests/test_parallel_execution.py
+
+      - name: Run Invalid image checksum unit test
+        run: sudo python3 ./tests/test_invalid_image_checksum.py
