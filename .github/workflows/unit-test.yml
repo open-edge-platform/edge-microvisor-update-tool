@@ -2,6 +2,9 @@ name: Run AB Update Tool Tests
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   run_ab_update_tool_tests:
     name: Running AB Update Tool Tests
