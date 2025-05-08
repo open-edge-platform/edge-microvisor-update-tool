@@ -1,19 +1,15 @@
-# AB OS Update Tool
+# OS Update Tool
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Lint Status](https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/lint-sh.yml/badge.svg)](https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/lint-sh.yml)
 [![Unit Test Status](https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/unit-test.yml/badge.svg)](https://[github.com/intel-innersource/os.linux.tiberos.ab-update](https://github.com/open-edge-platform/edge-microvisor-update-tool)/actions/workflows/unit-test.yml)
 
-The OS Update Tool (UT) is a utility used by the Inband Management Agent/Platform
-Update Agent for Day 2 operations. The UT provides interfaces to assist INMB/PUA
-agents in performing OS image A/B updates. Its functionalities include OS image
-downloading, flashing to an alternate partition, and updating the next boot
-configuration.
+The OS Update Tool provides a command-line interface (CLI) to manage Immutability OS image updates. Its core functionalities include OS raw image extraction, multiple Unified Kernel Imaage managememnt, flashing to an alternate boot partition, and updating the next boot configuration. The OS Update Tool delivers a command-line interface (CLI) for the streamlined management of Immutability OS image updates. Its essential capabilities include the extraction of OS raw images, management of multiple Unified Kernel Images (UKIs), flashing images to an alternate boot partition, precise configuration of the next system boot and error recovery.
 
 ___
 
-## How to use the AB UT for OS AB swapping
+## Using the OS Update Tool for Immutable OS Updates
 
-The default location for the AB Update Tool will be /usr/bin/os-update-tool.sh
+The default location for the OS Update Tooll will be /usr/bin/os-update-tool.sh
 
 ### Step 1. List available function
 
