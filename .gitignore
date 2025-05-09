@@ -1,4 +1,8 @@
-build/
+# Binaries
+bin
+build
+vendor
+coverage
 rpm/BUILD/
 rpm/RPMS/
 rpm/SRPMS/

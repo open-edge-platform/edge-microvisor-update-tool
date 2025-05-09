@@ -1,33 +1,39 @@
-# SPDX-FileCopyrightText: (C) 2023 Intel Corporation
-# SPDX-License-Identifier: LicenseRef-Intel
-
-NAME ?= os-ab-update
-BUILD_DIR ?= build/artifacts
-SCRIPTS_DIR := ./ci_scripts
+# Variables
+APP_NAME = os-ab-update
+SRC_DIR = ./cmd
+BUILD_DIR = ./build
+COVERAGE_DIR = ./coverage
 TOPDIR = $(shell pwd)/rpm
-PACKAGE_BUILD_DIR ?= $(BUILD_DIR)/package
-PKG_VERSION := $(shell if grep -q dev ab-update-modules/VERSION; then echo $$(cat ab-update-modules/VERSION)-$$(git rev-parse --short HEAD); else cat ab-update-modules/VERSION; fi)
-VERSION := $(shell cat ab-update-modules/VERSION)
-COMMIT := $(shell git rev-parse --short HEAD)
-ifneq (,$(findstring dev,$(VERSION)))
-	PKG_VERSION = $(VERSION)-$(COMMIT)
-else
-	PKG_VERSION = $(VERSION)
-endif
-TARBALL_DIR := $(BUILD_DIR)/$(NAME)-$(PKG_VERSION)
-# Define variables for paths
+PKG_VERSION := $(shell cat VERSION)
+TARBALL_DIR := $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION)
 BINDIR = $(DESTDIR)/usr/bin
-MODULEDIR = $(BINDIR)/ab-update-modules
 
-.PHONY: all build clean help lint list package test tarball
+# Commands
+build:
+	@echo "Building the application..."
+	@mkdir -p $(BUILD_DIR)
+	@go build -ldflags "-X main.Version=$(PKG_VERSION)" -o $(BUILD_DIR)/$(APP_NAME) $(SRC_DIR)
+	@echo "Build completed. Binary is located at $(BUILD_DIR)/$(APP_NAME)"
 
-all: tarball
-	@# Help: runs build, lint, test & package targets
+install:
+	@echo "Installing to $(BINDIR)"
+	mkdir -p $(BINDIR)
+	install -p -m 0770 $(BUILD_DIR)/$(APP_NAME) $(BINDIR)/$(APP_NAME)
+	@echo "Installation completed. Binary is located at /usr/bin/$(APP_NAME)"
 
-clean:
-	@# Help: deletes build directory
-	rm -rf $(BUILD_DIR)/*
-	rm -rf rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS
+lint:
+	@echo "Running Go linter..."
+	@golangci-lint run ./... --config .golangci.yml --skip-dirs $(shell go env GOPATH)
+	@echo "Linting completed."
+
+test:
+	@echo "Running unit tests..."
+	@mkdir -p $(COVERAGE_DIR)
+	@go test ./... -v -coverprofile=$(COVERAGE_DIR)/coverage.out
+	@go tool cover -html=$(COVERAGE_DIR)/coverage.out -o $(COVERAGE_DIR)/coverage.html
+	@echo "Unit tests completed. Coverage report is located at $(COVERAGE_DIR)/coverage.html"
+
+.PHONY: build lint test tarball rpm_package
 
 tarball:
 	@# Help: creates source tarball
@@ -35,40 +41,17 @@ tarball:
 
 	mkdir -p $(TARBALL_DIR)
 	mkdir -p rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS
-	cp -r ab-update-modules/ Makefile os-update-tool.sh $(TARBALL_DIR)
+	cp -r cmd/ internal/ pkg/ Makefile VERSION $(TARBALL_DIR)
 	sed -i "s#COMMIT := .*#COMMIT := $(COMMIT)#" $(TARBALL_DIR)/Makefile
-	tar -zcf $(BUILD_DIR)/$(NAME)-$(PKG_VERSION).tar.gz --directory=$(BUILD_DIR) $(NAME)-$(PKG_VERSION)
-	cp $(BUILD_DIR)/$(NAME)-$(PKG_VERSION).tar.gz ./rpm/SOURCES
+	tar -zcf $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION).tar.gz --directory=$(BUILD_DIR) $(APP_NAME)-$(PKG_VERSION)
+	cp $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION).tar.gz ./rpm/SOURCES
 
 	@echo "---END MAKEFILE TARBALL---"
 
 rpm_package:
-	rpmbuild -ba rpm/SPECS/$(NAME).spec --define "_topdir $(TOPDIR)"
+	rpmbuild -ba rpm/SPECS/$(APP_NAME).spec --define "_topdir $(TOPDIR)"
 
-install:
-	@echo "Installing to $(BINDIR) and $(MODULEDIR)"
-	# Create directories
-	mkdir -p $(MODULEDIR)
-
-	# Install the script files
-	install -p -m 0770 os-update-tool.sh $(BINDIR)/os-update-tool.sh
-	install -p -m 0660 ab-update-modules/VERSION $(MODULEDIR)/VERSION
-	install -p -m 0660 ab-update-modules/common.sh $(MODULEDIR)/common.sh
-	install -p -m 0660 ab-update-modules/os-update-tool.config $(MODULEDIR)/os-update-tool.config
-	install -p -m 0660 ab-update-modules/get_image.sh $(MODULEDIR)/get_image.sh
-	install -p -m 0660 ab-update-modules/log.sh $(MODULEDIR)/log.sh
-	install -p -m 0660 ab-update-modules/OSutil.sh $(MODULEDIR)/OSutil.sh
-	install -p -m 0660 ab-update-modules/systemd_boot_config.sh $(MODULEDIR)/systemd_boot_config.sh
-	install -p -m 0660 ab-update-modules/writes.sh $(MODULEDIR)/writes.sh
-
-list: help
-	@# Help: displays make targets
-
-help:
-	@printf "%-20s %s\n" "Target" "Description"
-	@printf "%-20s %s\n" "------" "-----------"
-	@make -pqR : 2>/dev/null \
-		| awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' \
-		| sort \
-		| egrep -v -e '^[^[:alnum:]]' -e '^$@$$' \
-		| xargs -I _ sh -c 'printf "%-20s " _; make _ -nB | (grep -i "^# Help:" || echo "") | tail -1 | sed "s/^# Help: //g"'
+clean:
+	@# Help: deletes build directory
+	rm -rf $(BUILD_DIR)/*
+	rm -rf rpm/BUILDROOT rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS

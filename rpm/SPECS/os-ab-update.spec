@@ -1,6 +1,6 @@
 Summary:        OS AB Update Tool for OS A and B swapping for image based update
 Name:           os-ab-update
-Version:        2.6
+Version:        3.0
 Release:        1%{?dist}
 License:        LicenseRef-Intel
 Vendor:         Intel Corporation
@@ -22,7 +22,7 @@ architecture can be found in the ADR.
 
 %files
 %{_bindir}/os-update-tool.sh
-%{_bindir}/ab-update-modules/*
+%{_bindir}/os-ab-update
 
 %changelog
 * Thu Apr 10 2025 Suh Haw Teoh <suh.haw.teoh@intel.com> - 2.6-1
