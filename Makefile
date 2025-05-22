@@ -1,16 +1,25 @@
 # Variables
-APP_NAME = os-curation-tools
+APP_NAME = os-ab-update
 SRC_DIR = ./cmd
-BUILD_DIR = ./bin
-WORK_DIR = ./build
+BUILD_DIR = ./build
 COVERAGE_DIR = ./coverage
+TOPDIR = $(shell pwd)/rpm
+PKG_VERSION := $(shell cat VERSION)
+TARBALL_DIR := $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION)
+BINDIR = $(DESTDIR)/usr/bin
 
 # Commands
 build:
 	@echo "Building the application..."
 	@mkdir -p $(BUILD_DIR)
-	@go build -o $(BUILD_DIR)/$(APP_NAME) $(SRC_DIR)
+	@go build -ldflags "-X main.Version=$(PKG_VERSION)" -o $(BUILD_DIR)/$(APP_NAME) $(SRC_DIR)
 	@echo "Build completed. Binary is located at $(BUILD_DIR)/$(APP_NAME)"
+
+install:
+	@echo "Installing to $(BINDIR)"
+	mkdir -p $(BINDIR)
+	install -p -m 0770 $(BUILD_DIR)/$(APP_NAME) $(BINDIR)/$(APP_NAME)
+	@echo "Installation completed. Binary is located at /usr/bin/$(APP_NAME)"
 
 lint:
 	@echo "Running Go linter..."
@@ -24,4 +33,25 @@ test:
 	@go tool cover -html=$(COVERAGE_DIR)/coverage.out -o $(COVERAGE_DIR)/coverage.html
 	@echo "Unit tests completed. Coverage report is located at $(COVERAGE_DIR)/coverage.html"
 
-.PHONY: build lint test
+.PHONY: build lint test tarball rpm_package
+
+tarball:
+	@# Help: creates source tarball
+	@echo "---MAKEFILE TARBALL---"
+
+	mkdir -p $(TARBALL_DIR)
+	mkdir -p rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS
+	cp -r cmd/ internal/ pkg/ Makefile VERSION $(TARBALL_DIR)
+	sed -i "s#COMMIT := .*#COMMIT := $(COMMIT)#" $(TARBALL_DIR)/Makefile
+	tar -zcf $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION).tar.gz --directory=$(BUILD_DIR) $(APP_NAME)-$(PKG_VERSION)
+	cp $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION).tar.gz ./rpm/SOURCES
+
+	@echo "---END MAKEFILE TARBALL---"
+
+rpm_package:
+	rpmbuild -ba rpm/SPECS/$(APP_NAME).spec --define "_topdir $(TOPDIR)"
+
+clean:
+	@# Help: deletes build directory
+	rm -rf $(BUILD_DIR)/*
+	rm -rf rpm/BUILDROOT rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS

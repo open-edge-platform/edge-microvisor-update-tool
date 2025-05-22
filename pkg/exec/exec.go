@@ -46,6 +46,7 @@ var commandMap = map[string]string{
 	"findmnt":     "/usr/bin/findmnt",
 	"chroot":      "/usr/sbin/chroot",
 	"e2fsck":      "/usr/sbin/e2fsck",
+	"sh":          "/bin/sh",
 	// Add more mappings as needed
 }
 
@@ -84,6 +85,13 @@ func ExecuteCommand(cmdKey string, args ...string) (string, error) {
 	// Run the command and capture the output
 	output, err := cmd.CombinedOutput()
 	if err != nil {
+		// Check if the error is due to a non-zero exit code (e.g., pattern not found)
+		if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 1 {
+			// Pattern not found, return empty output without treating it as an error
+			fmt.Printf("Command '%s' executed successfully but returned zero results.\n", cmdKey)
+			return "", nil
+		}
+
 		return "", fmt.Errorf("failed to execute command: %v, output: %s", err, string(output))
 	}
 
