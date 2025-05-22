@@ -1,121 +1,71 @@
-# OS Update Tool
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![Lint Status](https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/lint-sh.yml/badge.svg)](https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/lint-sh.yml)
-[![Unit Test Status](https://github.com/open-edge-platform/edge-microvisor-update-tool/actions/workflows/unit-test.yml/badge.svg)](https://[github.com/intel-innersource/os.linux.tiberos.ab-update](https://github.com/open-edge-platform/edge-microvisor-update-tool)/actions/workflows/unit-test.yml)
+# OS AB Update Golang Version
 
-The OS Update Tool provides a command-line interface (CLI) to manage Immutability OS image updates. Its core functionalities include OS raw image extraction, multiple Unified Kernel Imaage managememnt, flashing to an alternate boot partition, and updating the next boot configuration. The OS Update Tool delivers a command-line interface (CLI) for the streamlined management of Immutability OS image updates. Its essential capabilities include the extraction of OS raw images, management of multiple Unified Kernel Images (UKIs), flashing images to an alternate boot partition, precise configuration of the next system boot and error recovery.
 
-___
+## Getting Started
 
-## Using the OS Update Tool for Immutable OS Updates
-
-The default location for the OS Update Tooll will be /usr/bin/os-update-tool.sh
-
-### Step 1. List available function
+To get started with this project, clone the repository and navigate into the project directory:
 
 ```bash
-cd /usr/bin
+git clone <repository-url>
+cd <repo-name>
 ```
+
+## Prerequisites
+
+Make sure you have Go installed on your machine. You can download it from the official Go website.
+
+## Running the Application
+
+To run the application, use the following command:
 
 ```bash
-sudo ./os-update-tool.sh -h
+go run cmd/main.go
 ```
 
-**output:**
+The `main.go` file contains the entry point of the application. It initializes the application and starts the main process. Below are the possible Cobra commands defined in `main.go`:
 
-```bash
-os-update-tool ver-1.7
+### Commands
 
-Usage: sudo os-update-tool.sh [-r] [-v] [-a] [-c] [-w] [-u string] [-s string] [-h] [--debug]
+The application provides several commands to manage the OS update tool:
 
-Options:
-  -r      Restore to previous boot.
-  -v      Display current active partition.
-  -a      Apply updated image as next boot.
-  -c      Commit Updated image as default boot.
-  -w      Write rootfs partition.
-  -u      Define update image source path.
-  -s      Define sha256 checksum value for the update image.
-  -h      Display this help message.
-  --debug Executes with debug log.
+- write [update-image-path] [checksum]: Write rootfs partition with the specified update image path and checksum.    
+- apply: Apply the updated image as the next boot.    
+- commit: Commit the updated image as the default boot.    
+- rollback: Rollback to the previous boot.    
+- display: Display the current active partition.    
+
+Make sure to review and understand the functionality implemented in `main.go` to effectively run and modify the application.   
+
+Write rootfs partition:
+```
+go run cmd/main.go write /tmp/abc.raw.tar xx4454-dddf-dfdfd
 ```
 
-### Step 2. Write to inactive partition
-
-The logic will look for partition marked with rootfs
-
-```bash
-sudo ./os-update-tool.sh -w -u /mnt/tiber-readonly-1.0.20240920.1734.raw.xz -s e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+Apply the updated image as the next boot.
+```
+go run cmd/main.go apply
 ```
 
-### Step 3: Apply image as next boot
-
-```bash
-sudo ./os-update-tool.sh -a
+Commit updated image as default boot:
+```
+go run cmd/main.go commit
 ```
 
-### Step 4: Reboot the device
-
-```bash
-reboot
+Rollback to the previous boot.
+```
+go run cmd/main.go rollback
 ```
 
-### Step 5: Commit image as a default image
-
-If everything works fine after rebooted in previous step, commit the image.
-
-```bash
-sudo ./os-update-tool.sh -c
+Display current active partition:
+```
+go run cmd/main.go display
 ```
 
-___
-
-## Additional functionality
-
-### 1. Restore previous boot
-
-```bash
-sudo ./os-update-tool.sh -r
-```
-
-### 2. Display current boot partition and its image UUID
-
-```bash
-sudo ./os-update-tool.sh -v
-```
-
-### 3. Enables Debug by adding "--debug"
-
-```bash
-sudo ./os-update-tool.sh -v --debug
-```
-
-### 4. Enable Developer mode by adding "--dev"
-
-Currently, dev mode will auto create user for the newly installed OS.
-
-```bash
-sudo ./os-update-tool.sh -w -u /mnt/tiber-readonly-1.0.20240920.1734.raw.xz -s e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --dev
-```
-
-## Getting Help
-
-If you encounter bugs, have feature requests, or need assistance,
-[file a GitHub Issue](https://github.com/open-edge-platform/edge-microvisor-update-tool/issues).
-
-Before submitting a new report, check the existing issues to see if a similar one has not
-been filed already. If no matching issue is found, feel free to file the issue as described
-in the [contribution guide](./CONTRIBUTING.md).
-
-For security-related concerns, please refer to [SECURITY.md](./SECURITY.md).
-
-## License Information
-
-Edge Microvisor Update Tool is open source and licensed under the MIT License.
-See the [LICENSE](./LICENSE) file for more details.
 
 ## Contributing
 
-As an open-source project, Edge Microvisor Update Tool always looks for
-community-driven improvements. If you are interested in making the product even
-better, see how you can help in the [contribution guide](./CONTRIBUTING.md).
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for more details.
