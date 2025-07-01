@@ -12,13 +12,13 @@ BINDIR = $(DESTDIR)/usr/bin
 build:
 	@echo "Building the application..."
 	@mkdir -p $(BUILD_DIR)
-	@go build -ldflags "-X main.Version=$(PKG_VERSION)" -o $(BUILD_DIR)/$(APP_NAME) $(SRC_DIR)
-	@echo "Build completed. Binary is located at $(BUILD_DIR)/$(APP_NAME)"
+	@go build -ldflags "-X main.Version=$(PKG_VERSION)" -o $(APP_NAME) $(SRC_DIR)
+	@echo "Build completed. Binary is located at ./$(APP_NAME)"
 
 install:
 	@echo "Installing to $(BINDIR)"
 	mkdir -p $(BINDIR)
-	install -p -m 0770 $(BUILD_DIR)/$(APP_NAME) $(BINDIR)/$(APP_NAME)
+	install -p -m 0770 ./$(APP_NAME) $(BINDIR)/$(APP_NAME)
 	@echo "Installation completed. Binary is located at /usr/bin/$(APP_NAME)"
 
 lint:
@@ -41,7 +41,7 @@ tarball:
 
 	mkdir -p $(TARBALL_DIR)
 	mkdir -p rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS
-	cp -r cmd/ internal/ pkg/ Makefile VERSION $(TARBALL_DIR)
+	cp -r cmd/ internal/ pkg/ Makefile VERSION $(APP_NAME) $(TARBALL_DIR)
 	sed -i "s#COMMIT := .*#COMMIT := $(COMMIT)#" $(TARBALL_DIR)/Makefile
 	tar -zcf $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION).tar.gz --directory=$(BUILD_DIR) $(APP_NAME)-$(PKG_VERSION)
 	cp $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION).tar.gz ./rpm/SOURCES
