@@ -4,9 +4,9 @@ Version:        2.7
 Release:        1%{?dist}
 License:        LicenseRef-Intel
 Vendor:         Intel Corporation
-Distribution:   Tiber
+Distribution:   Edge Microvisor Toolkit
 Group:          System Environment/Base
-URL:            https://github.com/intel-innersource/os.linux.tiberos.ab-update
+URL:            https://github.com/open-edge-platform/edge-microvisor-update-tool
 Source0:        os-update-%{version}.tar.gz
 
 %description
