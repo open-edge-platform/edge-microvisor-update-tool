@@ -22,7 +22,7 @@ trap 'flock -u "$lfd"' EXIT
 
 # sanitize $0 to ensure no command injection
 mydir=$(cd -- "$(dirname "$0" | sed 's/[^a-zA-Z0-9._/-]//g')" && pwd -P)
-SRC_DIR="$mydir/ab-update-modules"
+SRC_DIR="$mydir/os-update-modules"
 
 # Source all utilities, ensuring that they are readable and executable shell scripts
 if [ -d "$SRC_DIR" ]; then

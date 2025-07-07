@@ -1,13 +1,13 @@
-Summary:        OS AB Update Tool for OS A and B swapping for image based update
-Name:           os-ab-update
-Version:        2.6
+Summary:        OS Update Tool for OS A and B swapping for image based update
+Name:           os-update
+Version:        2.7
 Release:        1%{?dist}
 License:        LicenseRef-Intel
 Vendor:         Intel Corporation
 Distribution:   Tiber
 Group:          System Environment/Base
 URL:            https://github.com/intel-innersource/os.linux.tiberos.ab-update
-Source0:        os-ab-update-%{version}.tar.gz
+Source0:        os-update-%{version}.tar.gz
 
 %description
 Purpose of this module is to enable OS  A and B swapping for Day 2 Operation. Details on the
@@ -22,9 +22,13 @@ architecture can be found in the ADR.
 
 %files
 %{_bindir}/os-update-tool.sh
-%{_bindir}/ab-update-modules/*
+%{_bindir}/os-update-modules/*
 
 %changelog
+* Mon Jul 07 2025 Suh Haw Teoh <suh.haw.teoh@intel.com> - 2.7-1
+- Bump version to 2.7
+- Improved wording
+
 * Thu Apr 10 2025 Suh Haw Teoh <suh.haw.teoh@intel.com> - 2.6-1
 - Bump version to 2.6
 - Add filesystem check before change UUID
@@ -47,9 +51,9 @@ architecture can be found in the ADR.
 
 * Mon Jan 20 2025 Suh Haw Teoh <suh.haw.teoh@intel.com> - 2.2-1
 - Bump version to 2.2
-- Fix AB update -c flag
+- Fix OS update -c flag
 - improve pattern matching for lsblk related operation
-- Fix AB update not able to run in service.
+- Fix OS update not able to run in service.
 - Add log in for B partition.
 
 * Mon Jan 20 2025 Jia Yong Tan <jia.yong.tan@intel.com> - 2.0-3
@@ -119,7 +123,7 @@ architecture can be found in the ADR.
 - Version 1.2
 
 * Fri Oct 18 2024 Suh Haw Teoh <suh.haw.teoh@intel.com> - 1.1-1
-- Remove ab-update conf file and update VERSION
+- Remove os-update conf file and update VERSION
 
 * Wed Oct 16 2024 Yock Gen Mah <yock.gen.mah@intel.com> - 1.0-6
 - Update to user tarball for source
