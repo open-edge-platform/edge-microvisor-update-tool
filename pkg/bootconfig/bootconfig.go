@@ -39,7 +39,7 @@ func GetActiveUKI() (string, error) {
 	return "", errors.New("no matching UKI file found")
 }
 
-// isUKIMatch is a helper funtion that
+// isUKIMatch is a helper function that
 // checks if the given partition matches the UKI file
 // based on LUKS UUID, Filesystem UUID, or PARTUUID.
 func isUKIMatch(partition, ukiFile string) (bool, error) {
@@ -92,7 +92,7 @@ func getBootctlUUID(ukiFile string) (string, error) {
 		return "", fmt.Errorf("failed to execute bootctl list: %w", err)
 	}
 
-	output := string(result)
+	output := result
 	lines := strings.Split(output, "\n")
 	for i, line := range lines {
 		if strings.Contains(line, ukiFile) {
@@ -126,7 +126,7 @@ func getLUKSUUID(partition string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve LUKS UUID for partition %s: %w", blockDevice, err)
 	}
-	return strings.TrimSpace(string(result)), nil
+	return strings.TrimSpace(result), nil
 }
 
 // getFilesystemUUID is a helper function to retrieves
@@ -137,7 +137,7 @@ func getFilesystemUUID(partition string) (string, error) {
 		return "", fmt.Errorf("failed to retrieve Filesystem UUID for partition %s: %w", partition, err)
 	}
 
-	output := string(result)
+	output := result
 	lines := strings.Split(output, "\n")
 	for _, line := range lines {
 		if strings.Contains(line, "Filesystem UUID") {
@@ -155,5 +155,5 @@ func getPARTUUID(partition string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve PARTUUID for partition %s: %w", partition, err)
 	}
-	return strings.TrimSpace(string(result)), nil
+	return strings.TrimSpace(result), nil
 }

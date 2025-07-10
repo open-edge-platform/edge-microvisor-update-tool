@@ -1,0 +1,37 @@
+name: Go Lint
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  golint:
+    name: Go Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20' # Specify the Go version you want to use
+
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $HOME/bin
+
+      - name: Check golangci-lint Version
+        run: |
+          $HOME/bin/golangci-lint version
+
+      - name: Run golangci-lint
+        run: |
+          GOPATH=$(go env GOPATH)
+          $HOME/bin/golangci-lint run ./... --skip-dirs $GOPATH
+

@@ -27,12 +27,18 @@ lint:
 	@echo "Linting completed."
 
 # Need to modify for all folders in internal folder
-test:
+unit_test:
 	@echo "Running unit tests..."
-	@go test -v ./internal/apply/
-	@echo "unit test execution completed for ./internal/apply"
+	@go test -v ./internal/... 
+	@echo "unit test execution completed for all modules"
 
-.PHONY: build lint test tarball rpm_package
+cover_unit:
+	mkdir -p $(BUILD_DIR)/coverage/unit
+	go test -v ./internal/... -cover -covermode count -args -test.gocoverdir=$(shell pwd)/$(BUILD_DIR)/coverage/unit | tee $(BUILD_DIR)/coverage/unit/unit.out
+	go tool covdata percent -i=$(BUILD_DIR)/coverage/unit
+	go tool covdata func -i=$(BUILD_DIR)/coverage/unit
+
+.PHONY: build lint unit_test cover_unit tarball rpm_package
 
 tarball:
 	@# Help: creates source tarball

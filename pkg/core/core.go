@@ -61,6 +61,7 @@ func GetTargetPartition() (string, error) {
 	return "", errors.New("failed to get any target partition (fde/default/dev) for new os")
 }
 
+//nolint unparam
 func getRootfsPartition(partitionFields []string) (string, error) {
 
 	tgtPrtn := ""
@@ -104,12 +105,12 @@ func getFdeTargetPartition() (string, error) {
 	}
 
 	// Check if the lsblk output contains the "crypt" keyword
-	if !strings.Contains(string(result), "crypt") {
+	if !strings.Contains(result, "crypt") {
 		return "", errors.New("FDE partition not found: no crypt partitions")
 	}
 
 	// Parse the output to find the target partition
-	lines := strings.Split(string(result), "\n")
+	lines := strings.Split(result, "\n")
 	for i := 0; i < len(lines); i++ {
 		fields := strings.Fields(lines[i])
 
@@ -170,12 +171,12 @@ func getDefaultTargetPartition() (string, error) {
 	}
 
 	// Check if the lsblk output contains the "rootfs_verity" keyword
-	if !strings.Contains(string(result), "rootfs_verity") {
+	if !strings.Contains(result, "rootfs_verity") {
 		return "", errors.New("DM-verity partition not found: no rootfs_verity device")
 	}
 
 	// Parse the output to find the target partition
-	lines := strings.Split(string(result), "\n")
+	lines := strings.Split(result, "\n")
 	tgtPrtn := ""
 	for i := 0; i < len(lines); i++ {
 		fields := strings.Fields(lines[i])
@@ -195,7 +196,7 @@ func getDefaultTargetPartition() (string, error) {
 			} else {
 				// Check if the partition name ends with "2" or "6". If not, skip it.
 				if strings.HasSuffix(fields[0], "2") || strings.HasSuffix(fields[0], "6") {
-					logger.LogInfo("Valid target partition found:", fields[0])
+					logger.LogInfo("Valid target partition found: %s", fields[0])
 					tgtPrtn = fields[0]
 					break
 				}
@@ -231,7 +232,7 @@ func getDevTargetPartition() (string, error) {
 	}
 
 	// Parse the output to find the target partition
-	lines := strings.Split(string(result), "\n")
+	lines := strings.Split(result, "\n")
 	var targetPartition string
 	for _, line := range lines {
 		fields := strings.Fields(line)
@@ -268,7 +269,11 @@ func VerifyChecksum(updateImagePath, checksumValue string) error {
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			fmt.Printf("Error closing file: %v\n", err)
+		}
+	}()
 
 	// Create a SHA256 hash
 	hasher := sha256.New()
@@ -344,21 +349,33 @@ func decompressGzip(inputPath, outputPath string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to open update image: %w", err)
 	}
-	defer inputFile.Close()
+	defer func() {
+		if err := inputFile.Close(); err != nil {
+			fmt.Printf("Error closing file: %v\n", err)
+		}
+	}()
 
 	// Create a gzip reader
 	gzipReader, err := gzip.NewReader(inputFile)
 	if err != nil {
 		return "", fmt.Errorf("failed to create gzip reader: %w", err)
 	}
-	defer gzipReader.Close()
+	defer func() {
+		if err := gzipReader.Close(); err != nil {
+			fmt.Printf("Error closing file: %v\n", err)
+		}
+	}()
 
 	// Create the output file
 	outputFileHandle, err := os.Create(outputPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to create decompressed image file: %w", err)
 	}
-	defer outputFileHandle.Close()
+	defer func() {
+		if err := outputFileHandle.Close(); err != nil {
+			fmt.Printf("Error closing file: %v\n", err)
+		}
+	}()
 
 	// Decompress the input file into the output file
 	if err := decompress(gzipReader, outputFileHandle); err != nil {
@@ -399,7 +416,7 @@ func GetPartitionUUID(partition string) (string, error) {
 	}
 
 	// Trim any whitespace from the result
-	return strings.TrimSpace(string(result)), nil
+	return strings.TrimSpace(result), nil
 }
 
 // LoopSetup mounts the update image to a loop device.
@@ -411,7 +428,7 @@ func LoopSetup(imagePath string) (string, error) {
 	}
 
 	// Trim any whitespace from the result
-	loopDevice := strings.TrimSpace(string(result))
+	loopDevice := strings.TrimSpace(result)
 
 	return loopDevice, nil
 }
@@ -447,7 +464,7 @@ func MountDevice(device, mountPoint string, readOnly bool, option ...string) err
 	// Append device and mount point
 	mountCmd = append(mountCmd, device, mountPoint)
 
-	logger.LogInfo("Mount command:", strings.Join(mountCmd, " "))
+	logger.LogInfo("Mount command: %s", strings.Join(mountCmd, " "))
 	// Execute the mount command
 	_, err := exec.ExecuteCommand(mountCmd[0], mountCmd[1:]...)
 	if err != nil {
@@ -477,7 +494,7 @@ func GetImageUUID(imagePath string) (string, error) {
 	}
 
 	// Trim any whitespace from the result
-	return strings.TrimSpace(string(result)), nil
+	return strings.TrimSpace(result), nil
 }
 
 // WriteRootfsToPartition writes the rootfs to the target partition.
@@ -629,7 +646,7 @@ func GetActivePartition() (string, error) {
 		return "", fmt.Errorf("failed to execute lsblk command: %w", err)
 	}
 
-	scanner := bufio.NewScanner(strings.NewReader(string(output)))
+	scanner := bufio.NewScanner(strings.NewReader(output))
 	for scanner.Scan() {
 		line := scanner.Text()
 
@@ -717,7 +734,7 @@ func ApplyBoot(nextUKI string) error {
 		return fmt.Errorf("failed to execute lsblk command: %w", err)
 	}
 
-	logger.LogInfo("Write result:", string(ddCmd))
+	logger.LogInfo("Write result: %s", ddCmd)
 
 	// Execute the sync command
 	_, err = exec.ExecuteCommand("sync")
@@ -777,13 +794,14 @@ func extractUUIDfromUKI(ukiFile string, identifier string) (string, error) {
 	logger.LogInfo("Get UUID from UKI file.")
 	var start, end int
 	// Determine the start and end positions based on the identifier
-	if identifier == "PARTUUID" {
+	switch identifier {
+	case "PARTUUID":
 		start = 9
 		end = 45
-	} else if identifier == "boot_uuid" {
+	case "boot_uuid":
 		start = 10
 		end = 46
-	} else {
+	default:
 		return "", fmt.Errorf("invalid identifier: %s", identifier)
 	}
 
@@ -793,7 +811,7 @@ func extractUUIDfromUKI(ukiFile string, identifier string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to get %s: %w", identifier, err)
 	}
-	cleanOutput := strings.TrimSpace(string(output))
+	cleanOutput := strings.TrimSpace(output)
 	extractedUUID := extractSubstring(cleanOutput, start, end)
 
 	return extractedUUID, nil
@@ -839,7 +857,7 @@ func FindPartitionByUUID(uuid string) string {
 		result = strings.TrimSpace(output)
 	}
 
-	lines := strings.Split(string(result), "\n")
+	lines := strings.Split(result, "\n")
 	for _, line := range lines {
 		if !strings.HasPrefix(line, "/dev/loop") {
 			return strings.TrimSpace(line)
@@ -883,10 +901,14 @@ func AddLogin(workDir, targetDev string) error {
 		if err != nil {
 			// Cleanup on failure
 			for _, mount := range mounts {
-				UnmountDevice(mount.target)
+				if err := UnmountDevice(mount.target); err != nil {
+					fmt.Printf("Failed to unmount device %s: %v\n", mount.target, err)
+				}
 			}
 			if chrootDir != "" {
-				DeleteDir(chrootDir)
+				if err := DeleteDir(chrootDir); err != nil {
+					fmt.Printf("Failed to delete directory %s: %v\n", chrootDir, err)
+				}
 			}
 			return fmt.Errorf("failed to mount %s to %s: %w", m.source, m.target, err)
 		}
@@ -908,10 +930,14 @@ func AddLogin(workDir, targetDev string) error {
 	if err != nil {
 		// Cleanup on failure
 		for _, mount := range mounts {
-			UnmountDevice(mount.target)
+			if err := UnmountDevice(mount.target); err != nil {
+				fmt.Printf("Failed to unmount device %s: %v\n", mount.target, err)
+			}
 		}
 		if chrootDir != "" {
-			DeleteDir(chrootDir)
+			if err := DeleteDir(chrootDir); err != nil {
+				fmt.Printf("Failed to delete directory %s: %v\n", chrootDir, err)
+			}
 		}
 		return fmt.Errorf("failed to add user %s in chroot environment %s: %w", username, chrootDir, err)
 	}
@@ -961,10 +987,14 @@ func RelabelSELinux(workDir, targetDev string) error {
 		if err != nil {
 			// Cleanup on failure
 			for _, mount := range mounts {
-				UnmountDevice(mount.target)
+				if err := UnmountDevice(mount.target); err != nil {
+					fmt.Printf("Failed to unmount device %s: %v\n", mount.target, err)
+				}
 			}
 			if updateMountPoint != "" {
-				DeleteDir(updateMountPoint)
+				if err := DeleteDir(updateMountPoint); err != nil {
+					fmt.Printf("Failed to delete directory %s: %v\n", updateMountPoint, err)
+				}
 			}
 			return fmt.Errorf("failed to mount %s to %s: %w", m.source, m.target, err)
 		}
@@ -978,10 +1008,14 @@ func RelabelSELinux(workDir, targetDev string) error {
 	if err != nil {
 		// Cleanup on failure
 		for _, mount := range mounts {
-			UnmountDevice(mount.target)
+			if err := UnmountDevice(mount.target); err != nil {
+				fmt.Printf("Failed to unmount device %s: %v\n", mount.target, err)
+			}
 		}
 		if updateMountPoint != "" {
-			DeleteDir(updateMountPoint)
+			if err := DeleteDir(updateMountPoint); err != nil {
+				fmt.Printf("Failed to delete directory %s: %v\n", updateMountPoint, err)
+			}
 		}
 		return fmt.Errorf("failed to relabel SELinux contexts in chroot environment %s: %w", updateMountPoint, err)
 	}
@@ -1013,17 +1047,17 @@ func CheckFDEOn() bool {
 	}
 
 	// Check if the output contains "No devices found"
-	if strings.Contains(string(output), "No devices found") {
+	if strings.Contains(output, "No devices found") {
 		return false
 	}
 
 	// Check if the output is empty
-	if strings.TrimSpace(string(output)) == "" {
+	if strings.TrimSpace(output) == "" {
 		return false
 	}
 
 	// Check if the output contains both "rootfs_a" and "rootfs_b"
-	if strings.Contains(string(output), "rootfs_a") && strings.Contains(string(output), "rootfs_b") {
+	if strings.Contains(output, "rootfs_a") && strings.Contains(output, "rootfs_b") {
 		return true // FDE is enabled
 	}
 
@@ -1040,7 +1074,7 @@ func CheckDMVerityOn() bool {
 
 	// Count the number of root ("/") mountpoints
 	rootCount := 0
-	lines := strings.Split(string(output), "\n")
+	lines := strings.Split(output, "\n")
 	for _, line := range lines {
 		fields := strings.Fields(line)
 		if len(fields) >= 3 && fields[2] == "/" {
@@ -1151,7 +1185,7 @@ func SetVerity(workDir, targetDev string) error {
 				return fmt.Errorf("failed to set up verity for rootfs_b: %w", err)
 			}
 			rootHash := extractRootHash(output)
-			err = os.WriteFile(filepath.Join(tempDir, "part_b_roothash"), []byte(rootHash), 0644)
+			err = os.WriteFile(filepath.Join(tempDir, "part_b_roothash"), []byte(rootHash), 0600)
 			if err != nil {
 				return fmt.Errorf("failed to write root hash for rootfs_b: %w", err)
 			}
@@ -1162,7 +1196,7 @@ func SetVerity(workDir, targetDev string) error {
 				return fmt.Errorf("failed to set up verity for rootfs_a: %w", err)
 			}
 			rootHash := extractRootHash(output)
-			err = os.WriteFile(filepath.Join(tempDir, "part_a_roothash"), []byte(rootHash), 0644)
+			err = os.WriteFile(filepath.Join(tempDir, "part_a_roothash"), []byte(rootHash), 0600)
 			if err != nil {
 				return fmt.Errorf("failed to write root hash for rootfs_a: %w", err)
 			}
@@ -1192,7 +1226,8 @@ func SetVerity(workDir, targetDev string) error {
 		if err != nil {
 			return fmt.Errorf("failed to convert fsIndex to integer: %w", err)
 		}
-		if fsIndexInt == INDEXPARTA {
+		switch fsIndexInt {
+		case INDEXPARTA:
 			logger.LogInfo("Verity Setup on %s\n", targetDev)
 			fnReturn, err = ReplaceDeviceIndex(targetDev, INDEXMAPPARTA)
 			if err != nil {
@@ -1203,11 +1238,11 @@ func SetVerity(workDir, targetDev string) error {
 				return fmt.Errorf("failed to set up verity for part A: %w", err)
 			}
 			rootHash := extractRootHash(output)
-			err = os.WriteFile(filepath.Join(tempDir, "part_a_roothash"), []byte(rootHash), 0644)
+			err = os.WriteFile(filepath.Join(tempDir, "part_a_roothash"), []byte(rootHash), 0600)
 			if err != nil {
 				return fmt.Errorf("failed to write root hash for part A: %w", err)
 			}
-		} else if fsIndexInt == INDEXPARTB {
+		case INDEXPARTB:
 			logger.LogInfo("Verity Setup on %s\n", targetDev)
 			fnReturn, err = ReplaceDeviceIndex(targetDev, INDEXMAPPARTB)
 			if err != nil {
@@ -1218,10 +1253,12 @@ func SetVerity(workDir, targetDev string) error {
 				return fmt.Errorf("failed to set up verity for part B: %w", err)
 			}
 			rootHash := extractRootHash(output)
-			err = os.WriteFile(filepath.Join(tempDir, "part_b_roothash"), []byte(rootHash), 0644)
+			err = os.WriteFile(filepath.Join(tempDir, "part_b_roothash"), []byte(rootHash), 0600)
 			if err != nil {
 				return fmt.Errorf("failed to write root hash for part B: %w", err)
 			}
+		default:
+			return fmt.Errorf("invalid fsIndexInt: %d", fsIndexInt)
 		}
 	}
 
@@ -1301,7 +1338,7 @@ func GetBlockName(device string) (string, error) {
 	}
 
 	// Parse the output line by line
-	scanner := bufio.NewScanner(strings.NewReader(string(output)))
+	scanner := bufio.NewScanner(strings.NewReader(output))
 	for scanner.Scan() {
 		line := scanner.Text()
 
