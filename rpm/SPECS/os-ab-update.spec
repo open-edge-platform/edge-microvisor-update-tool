@@ -8,6 +8,7 @@ Distribution:   Tiber
 Group:          System Environment/Base
 URL:            https://github.com/intel-innersource/os.linux.tiberos.ab-update
 Source0:        os-ab-update-%{version}.tar.gz
+%global _build_id_links none
 
 %description
 Purpose of this module is to enable OS  A and B swapping for Day 2 Operation. Details on the
@@ -16,13 +17,15 @@ architecture can be found in the ADR.
 %prep
 %setup -q
 
+%build
+make build GO_MOD=vendor
+
 %install
 # Install the script files under /usr/bin
 %make_install
 
 %files
-%{_bindir}/os-update-tool.sh
-%{_bindir}/os-ab-update
+/usr/bin/%{name}
 
 %changelog
 * Thu Apr 10 2025 Suh Haw Teoh <suh.haw.teoh@intel.com> - 2.6-1

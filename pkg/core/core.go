@@ -291,16 +291,56 @@ func VerifyChecksum(updateImagePath, checksumValue string) error {
 
 // DecompressImage decompresses a given image file and returns the path to the decompressed file.
 func DecompressImage(outputDir, updateImagePath string) (string, error) {
-	// Define the output directory for the decompressed image
-	outputFile := fmt.Sprintf("%s%s", outputDir, strings.TrimSuffix(filepath.Base(updateImagePath), ".gz"))
+	// Determine the file type based on the extension
+	var outputFile string
+	if strings.HasSuffix(updateImagePath, ".gz") {
+		outputFile = fmt.Sprintf("%s/%s", outputDir, strings.TrimSuffix(filepath.Base(updateImagePath), ".gz"))
+	} else if strings.HasSuffix(updateImagePath, ".xz") {
+		outputFile = fmt.Sprintf("%s/%s", outputDir, strings.TrimSuffix(filepath.Base(updateImagePath), ".xz"))
+	} else {
+		return "", fmt.Errorf("unsupported file extension")
+	}
 
 	// Ensure the output directory exists
 	if err := os.MkdirAll(outputDir, os.ModePerm); err != nil {
 		return "", fmt.Errorf("failed to create output directory: %w", err)
 	}
 
+	if strings.HasSuffix(updateImagePath, ".gz") {
+		// Handle .gz files
+		logger.LogInfo("Decompress gz file")
+		return decompressGzip(updateImagePath, outputFile)
+	} else if strings.HasSuffix(updateImagePath, ".xz") {
+		logger.LogInfo("Copy xz file to %s", outputDir)
+		input, err := os.Open(updateImagePath)
+		if err != nil {
+			return "", fmt.Errorf("failed to open update image: %w", err)
+		}
+		defer input.Close()
+
+		copiedPath := filepath.Join(outputDir, filepath.Base(updateImagePath))
+		output, err := os.Create(copiedPath)
+		if err != nil {
+			return "", fmt.Errorf("failed to create output file: %w", err)
+		}
+		defer output.Close()
+
+		if _, err := io.Copy(output, input); err != nil {
+			return "", fmt.Errorf("failed to copy update image: %w", err)
+		}
+		updateImagePath = copiedPath
+		logger.LogInfo("Decompress xz file")
+		// Handle .xz files using ExecuteCommand
+		return decompressXz(updateImagePath, outputFile)
+	}
+
+	return "", fmt.Errorf("unsupported file extension")
+}
+
+// decompressGzip handles the decompression of .gz files
+func decompressGzip(inputPath, outputPath string) (string, error) {
 	// Open the input .gz file
-	inputFile, err := os.Open(updateImagePath)
+	inputFile, err := os.Open(inputPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to open update image: %w", err)
 	}
@@ -314,7 +354,7 @@ func DecompressImage(outputDir, updateImagePath string) (string, error) {
 	defer gzipReader.Close()
 
 	// Create the output file
-	outputFileHandle, err := os.Create(outputFile)
+	outputFileHandle, err := os.Create(outputPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to create decompressed image file: %w", err)
 	}
@@ -325,7 +365,19 @@ func DecompressImage(outputDir, updateImagePath string) (string, error) {
 		return "", fmt.Errorf("failed to decompress image: %w", err)
 	}
 
-	return outputFile, nil
+	return outputPath, nil
+}
+
+// decompressXz handles the decompression of .xz files using ExecuteCommand
+func decompressXz(inputPath, outputPath string) (string, error) {
+	// Use the xz command to decompress the file
+	logger.LogInfo("Decompressing .xz file: %s", inputPath+" to "+outputPath)
+	_, err := exec.ExecuteCommand("xz", "-d", inputPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to decompress .xz image: %w", err)
+	}
+
+	return outputPath, nil
 }
 
 // decompress is a helper function to handle the decompression logic
