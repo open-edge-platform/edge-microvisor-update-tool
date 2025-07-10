@@ -3,19 +3,19 @@ package apply
 import (
 	"fmt"
 
-	"os.abupdate.tool/pkg/logger"
 	boot "os.abupdate.tool/pkg/bootconfig"
 	"os.abupdate.tool/pkg/core"
 	"os.abupdate.tool/pkg/exec"
+	"os.abupdate.tool/pkg/logger"
 )
 
 var (
-	checkWriteDoneFunc = core.CheckWriteDone
+	checkWriteDoneFunc      = core.CheckWriteDone
 	checkFirstUKIExistsFunc = core.CheckFirstUKIExists
-	renameEFIFunc = core.RenameEFI
-	getActiveUKIFunc = boot.GetActiveUKI
-	applyBootFunc = core.ApplyBoot
-	executeCommandFunc = exec.ExecuteCommand
+	renameEFIFunc           = core.RenameEFI
+	getActiveUKIFunc        = boot.GetActiveUKI
+	applyBootFunc           = core.ApplyBoot
+	executeCommandFunc      = exec.ExecuteCommand
 )
 
 func ApplyChange() error {
@@ -59,7 +59,7 @@ func ApplyChange() error {
 	// Execute the bootctl command to set the default boot entry
 	output, err := executeCommandFunc("bootctl", "set-oneshot", nextUKI)
 	if err != nil {
-		logger.LogError("Failed to apply new OS. Output: %s", string(output))
+		logger.LogError("Failed to apply new OS. Output: %s", output)
 		return err
 	}
 
