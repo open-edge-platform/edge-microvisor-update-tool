@@ -76,6 +76,7 @@ func WritePartition(updateImagePath string, checksumValue string, devMode bool) 
 		logger.LogError("Failed to decompress image: %s, error: %v", updateImagePath, err)
 		return fmt.Errorf("failed to decompress image: %s, error: %w", updateImagePath, err)
 	}
+	logger.LogInfo("Decompressed image path: %s", decompressedImagePath)
 	// Mount the update image to loop device
 	loopDev, err = core.LoopSetup(decompressedImagePath)
 	if err != nil {
