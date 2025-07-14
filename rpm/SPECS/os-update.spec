@@ -1,6 +1,6 @@
 Summary:        OS Update Tool for OS A and B swapping for image based update
 Name:           os-update
-Version:        2.7
+Version:        2.8
 Release:        1%{?dist}
 License:        LicenseRef-Intel
 Vendor:         Intel Corporation
@@ -25,6 +25,10 @@ architecture can be found in the ADR.
 %{_bindir}/os-update-modules/*
 
 %changelog
+* Tue Jul 15 2025 Samuel Taripin <samuel.taripin@intel.com> - 2.8-1
+- Bump version to 2.8
+- Remove bootctl remove logic
+
 * Mon Jul 07 2025 Suh Haw Teoh <suh.haw.teoh@intel.com> - 2.7-1
 - Bump version to 2.7
 - Improved wording
