@@ -71,18 +71,6 @@ function create_boot_config {
     local next_boot=""
     local active_boot=""
 
-    # for compatibility moving to secure boot
-    if [ "$($bootctl is-installed)" == "yes" ]; then
-        $bootctl remove
-
-        ENTRIES_DIR="/boot/efi/loader/entries"
-
-        if [ -d "$ENTRIES_DIR" ]; then
-            rm -f "$ENTRIES_DIR"/*
-        fi
-
-    fi
-
     # active uki has -2
     if [[ "$active_UKI" =~ -2\.efi$ ]]; then
         active_boot="linux-2.efi"
