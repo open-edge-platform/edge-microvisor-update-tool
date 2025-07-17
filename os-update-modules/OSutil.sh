@@ -333,6 +333,10 @@ function set_partition_uuid {
         # Extract the base device (e.g., /dev/sda from /dev/sda3)
         local base_device
         base_device="${device_partition%[0-9]*}"
+        # If base_device contains 'nvme', remove trailing 'p'
+        if [[ "$base_device" == *nvme* && "$base_device" == *p ]]; then
+            base_device="${base_device%p}"
+        fi
 
         # Extract the partition number (e.g., 3 from /dev/sda3)
         local partition_number
