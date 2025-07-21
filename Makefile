@@ -1,5 +1,5 @@
 # Variables
-APP_NAME = os-ab-update
+APP_NAME = os-update
 SRC_DIR = ./cmd
 BUILD_DIR = ./build
 COVERAGE_DIR = ./coverage
@@ -41,8 +41,9 @@ tarball:
 
 	mkdir -p $(TARBALL_DIR)
 	mkdir -p rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS
-	cp -r cmd/ internal/ pkg/ Makefile VERSION $(TARBALL_DIR)
+	cp -r cmd/ internal/ pkg/ Makefile VERSION go.mod go.sum $(TARBALL_DIR)
 	sed -i "s#COMMIT := .*#COMMIT := $(COMMIT)#" $(TARBALL_DIR)/Makefile
+	cd $(TARBALL_DIR) && go mod tidy && go mod vendor
 	tar -zcf $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION).tar.gz --directory=$(BUILD_DIR) $(APP_NAME)-$(PKG_VERSION)
 	cp $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION).tar.gz ./rpm/SOURCES
 

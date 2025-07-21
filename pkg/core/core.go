@@ -13,8 +13,8 @@ import (
 	"strconv"
 	"strings"
 
-	exec "os.abupdate.tool/pkg/exec"
-	"os.abupdate.tool/pkg/logger"
+	exec "os.update.tool/pkg/exec"
+	"os.update.tool/pkg/logger"
 )
 
 const (

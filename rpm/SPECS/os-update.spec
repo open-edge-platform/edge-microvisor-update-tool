@@ -1,5 +1,5 @@
-Summary:        OS AB Update Tool for OS A and B swapping for image based update
-Name:           os-ab-update
+Summary:        OS Update Tool for OS A and B swapping for image based update
+Name:           os-update
 Version:        3.0
 Release:        1%{?dist}
 License:        LicenseRef-Intel
@@ -7,7 +7,7 @@ Vendor:         Intel Corporation
 Distribution:   Tiber
 Group:          System Environment/Base
 URL:            https://github.com/intel-innersource/os.linux.tiberos.ab-update
-Source0:        os-ab-update-%{version}.tar.gz
+Source0:        os-update-%{version}.tar.gz
 %global _build_id_links none
 
 %description
@@ -50,9 +50,9 @@ make build GO_MOD=vendor
 
 * Mon Jan 20 2025 Suh Haw Teoh <suh.haw.teoh@intel.com> - 2.2-1
 - Bump version to 2.2
-- Fix AB update -c flag
+- Fix OS update -c flag
 - improve pattern matching for lsblk related operation
-- Fix AB update not able to run in service.
+- Fix OS update not able to run in service.
 - Add log in for B partition.
 
 * Mon Jan 20 2025 Jia Yong Tan <jia.yong.tan@intel.com> - 2.0-3
@@ -122,7 +122,7 @@ make build GO_MOD=vendor
 - Version 1.2
 
 * Fri Oct 18 2024 Suh Haw Teoh <suh.haw.teoh@intel.com> - 1.1-1
-- Remove ab-update conf file and update VERSION
+- Remove os-update conf file and update VERSION
 
 * Wed Oct 16 2024 Yock Gen Mah <yock.gen.mah@intel.com> - 1.0-6
 - Update to user tarball for source

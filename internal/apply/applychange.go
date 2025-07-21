@@ -3,10 +3,10 @@ package apply
 import (
 	"fmt"
 
-	"os.abupdate.tool/pkg/logger"
-	boot "os.abupdate.tool/pkg/bootconfig"
-	"os.abupdate.tool/pkg/core"
-	"os.abupdate.tool/pkg/exec"
+	boot "os.update.tool/pkg/bootconfig"
+	"os.update.tool/pkg/core"
+	"os.update.tool/pkg/exec"
+	"os.update.tool/pkg/logger"
 )
 
 func ApplyChange() error {

@@ -3,7 +3,7 @@ package flashing
 import (
 	"testing"
 
-	core "os.abupdate.tool/pkg/core"
+	core "os.update.tool/pkg/core"
 )
 
 func TestWritePartition(t *testing.T) {

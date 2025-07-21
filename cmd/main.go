@@ -5,12 +5,12 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	apply "os.abupdate.tool/internal/apply"
-	commit "os.abupdate.tool/internal/commit"
-	rollback "os.abupdate.tool/internal/rollback"
-	write "os.abupdate.tool/internal/write"
-	core "os.abupdate.tool/pkg/core"
-	"os.abupdate.tool/pkg/logger"
+	apply "os.update.tool/internal/apply"
+	commit "os.update.tool/internal/commit"
+	rollback "os.update.tool/internal/rollback"
+	write "os.update.tool/internal/write"
+	core "os.update.tool/pkg/core"
+	"os.update.tool/pkg/logger"
 )
 
 var (
@@ -29,7 +29,7 @@ func printVersion() {
 
 var rootCmd = &cobra.Command{
 	Use:   "os-update-tool",
-	Short: "os-update-tool ver-2.4",
+	Short: "os-update-tool ver-3.0",
 	Long:  `Usage: sudo os-update-tool [command] [flags]`,
 }
 
