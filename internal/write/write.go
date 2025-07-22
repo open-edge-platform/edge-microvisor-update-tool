@@ -3,8 +3,8 @@ package flashing
 import (
 	"fmt"
 
-	core "os.abupdate.tool/pkg/core"
-	"os.abupdate.tool/pkg/logger"
+	core "os.update.tool/pkg/core"
+	"os.update.tool/pkg/logger"
 )
 
 // Helper function to clean up resources

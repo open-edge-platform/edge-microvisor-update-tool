@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	boot "os.abupdate.tool/pkg/bootconfig"
-	core "os.abupdate.tool/pkg/core"
-	"os.abupdate.tool/pkg/exec"
-	"os.abupdate.tool/pkg/logger"
+	boot "os.update.tool/pkg/bootconfig"
+	core "os.update.tool/pkg/core"
+	"os.update.tool/pkg/exec"
+	"os.update.tool/pkg/logger"
 )
 
 // CommitChange sets the next boot entry to the new OS

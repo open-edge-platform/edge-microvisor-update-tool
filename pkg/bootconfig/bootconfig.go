@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	core "os.abupdate.tool/pkg/core"
-	exec "os.abupdate.tool/pkg/exec"
+	core "os.update.tool/pkg/core"
+	exec "os.update.tool/pkg/exec"
 )
 
 // getActiveUKI retrieves the active UKI file based on

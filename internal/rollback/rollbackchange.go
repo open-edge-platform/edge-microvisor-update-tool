@@ -3,9 +3,9 @@ package rollback
 import (
 	"fmt"
 
-	boot "os.abupdate.tool/pkg/bootconfig"
-	"os.abupdate.tool/pkg/exec"
-	"os.abupdate.tool/pkg/logger"
+	boot "os.update.tool/pkg/bootconfig"
+	"os.update.tool/pkg/exec"
+	"os.update.tool/pkg/logger"
 )
 
 // RollbackChange restores the previous UKI
