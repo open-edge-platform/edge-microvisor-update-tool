@@ -26,14 +26,19 @@ lint:
 	@golangci-lint run ./... --config .golangci.yml --skip-dirs $(shell go env GOPATH)
 	@echo "Linting completed."
 
-test:
+# Need to modify for all folders in internal folder
+unit_test:
 	@echo "Running unit tests..."
-	@mkdir -p $(COVERAGE_DIR)
-	@go test ./... -v -coverprofile=$(COVERAGE_DIR)/coverage.out
-	@go tool cover -html=$(COVERAGE_DIR)/coverage.out -o $(COVERAGE_DIR)/coverage.html
-	@echo "Unit tests completed. Coverage report is located at $(COVERAGE_DIR)/coverage.html"
+	@go test -v ./internal/... 
+	@echo "unit test execution completed for all modules"
 
-.PHONY: build lint test tarball rpm_package
+cover_unit:
+	mkdir -p $(BUILD_DIR)/coverage/unit
+	go test -v ./internal/... -cover -covermode count -args -test.gocoverdir=$(shell pwd)/$(BUILD_DIR)/coverage/unit | tee $(BUILD_DIR)/coverage/unit/unit.out
+	go tool covdata percent -i=$(BUILD_DIR)/coverage/unit
+	go tool covdata func -i=$(BUILD_DIR)/coverage/unit
+
+.PHONY: build lint unit_test cover_unit tarball rpm_package
 
 tarball:
 	@# Help: creates source tarball

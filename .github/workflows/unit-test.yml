@@ -1,0 +1,30 @@
+name: Run AB Update Tool Tests
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  run_ab_update_tool_tests:
+    name: Running AB Update Tool Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24' # Specify the Go version you want to use
+
+      - name: Install Dependencies
+        run: |
+          go mod download
+
+      - name: Run all the unit tests
+        run: |
+          go test -v ./internal/...
+

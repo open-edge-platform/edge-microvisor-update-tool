@@ -1,4 +1,4 @@
-package apply
+package commit
 
 import (
 	"fmt"
@@ -10,19 +10,26 @@ import (
 	"os.update.tool/pkg/logger"
 )
 
+var (
+	checkWriteDoneFunc = core.CheckWriteDone
+	getActiveUKIFunc   = boot.GetActiveUKI
+	executeCommandFunc = exec.ExecuteCommand
+	resetWriteDoneFunc = core.ResetWriteDone
+)
+
 // CommitChange sets the next boot entry to the new OS
 // by executing the bootctl set-default command.
 func CommitChange() error {
 	var curUKI string
 
 	// Check if write is done
-	if !core.CheckWriteDone() {
+	if !checkWriteDoneFunc() {
 		logger.LogError("Nothing to commit: write is not done")
 		return fmt.Errorf("nothing to commit: write is not done")
 	}
 
 	// Get the active UKI
-	activeUKI, err := boot.GetActiveUKI()
+	activeUKI, err := getActiveUKIFunc()
 	if err != nil {
 		logger.LogError("Failed to get active UKI: %v", err)
 		return fmt.Errorf("failed to get active uki: %w", err)
@@ -35,14 +42,14 @@ func CommitChange() error {
 	logger.LogInfo("Next Default: %s", curUKI)
 
 	// Execute the bootctl set-default command
-	output, err := exec.ExecuteCommand("bootctl", "set-default", curUKI)
+	output, err := executeCommandFunc("bootctl", "set-default", curUKI)
 	if err != nil {
-		logger.LogError("Failed to commit new OS. Output: %s", string(output))
+		logger.LogError("Failed to commit new OS. Output: %s", output)
 		return err
 	}
 
 	// Remove the .bak file
-	if !core.ResetWriteDone() {
+	if !resetWriteDoneFunc() {
 		logger.LogError("Failed to remove temp UKI file: %v", err)
 		return fmt.Errorf("failed to remove temp uki file: %w", err)
 	}

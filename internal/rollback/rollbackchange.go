@@ -8,13 +8,18 @@ import (
 	"os.update.tool/pkg/logger"
 )
 
+var (
+	getActiveUKIFunc   = boot.GetActiveUKI
+	executeCommandFunc = exec.ExecuteCommand
+)
+
 // RollbackChange restores the previous UKI
 // by setting it as the default.
 func RollbackChange() error {
 	var prevUKI string
 
 	// Get the active UKI
-	activeUKI, err := boot.GetActiveUKI()
+	activeUKI, err := getActiveUKIFunc()
 	if err != nil {
 		logger.LogError("Failed to get active UKI: %v", err)
 		return fmt.Errorf("failed to get active uki: %w", err)
@@ -32,9 +37,9 @@ func RollbackChange() error {
 	logger.LogInfo("Previous UKI: %s", prevUKI)
 
 	// Execute the bootctl command to set the default boot entry
-	output, err := exec.ExecuteCommand("bootctl", "set-default", prevUKI)
+	output, err := executeCommandFunc("bootctl", "set-default", prevUKI)
 	if err != nil {
-		logger.LogError("Failed to restore previous OS. Output: %s", string(output))
+		logger.LogError("Failed to restore previous OS. Output: %s", output)
 		return err
 	}
 

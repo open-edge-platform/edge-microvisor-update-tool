@@ -9,26 +9,35 @@ import (
 	"os.update.tool/pkg/logger"
 )
 
+var (
+	checkWriteDoneFunc      = core.CheckWriteDone
+	checkFirstUKIExistsFunc = core.CheckFirstUKIExists
+	renameEFIFunc           = core.RenameEFI
+	getActiveUKIFunc        = boot.GetActiveUKI
+	applyBootFunc           = core.ApplyBoot
+	executeCommandFunc      = exec.ExecuteCommand
+)
+
 func ApplyChange() error {
 	var nextUKI string
 
 	// Check if write is done
-	if !core.CheckWriteDone() {
+	if !checkWriteDoneFunc() {
 		logger.LogError("Nothing to apply: write is not done")
 		return fmt.Errorf("nothing to apply: write is not done")
 	}
 
 	// Check if linux.efi exists
-	if !core.CheckFirstUKIExists() {
+	if !checkFirstUKIExistsFunc() {
 		// Rename current UKI to linux.efi
-		if err := core.RenameEFI(); err != nil {
+		if err := renameEFIFunc(); err != nil {
 			logger.LogError("Failed to create linux.efi: %v", err)
 			return fmt.Errorf("failed to create linux.efi: %w", err)
 		}
 	}
 
 	// Get the active UKI
-	activeUKI, err := boot.GetActiveUKI()
+	activeUKI, err := getActiveUKIFunc()
 	if err != nil {
 		logger.LogError("Failed to get active UKI: %v", err)
 		return fmt.Errorf("failed to get active uki: %w", err)
@@ -42,15 +51,15 @@ func ApplyChange() error {
 	}
 
 	// Apply new UKI
-	if core.ApplyBoot(nextUKI) != nil {
+	if applyBootFunc(nextUKI) != nil {
 		logger.LogError("Failed to apply new OS: %v", err)
 		return fmt.Errorf("failed to apply new OS: %w", err)
 	}
 
 	// Execute the bootctl command to set the default boot entry
-	output, err := exec.ExecuteCommand("bootctl", "set-oneshot", nextUKI)
+	output, err := executeCommandFunc("bootctl", "set-oneshot", nextUKI)
 	if err != nil {
-		logger.LogError("Failed to apply new OS. Output: %s", string(output))
+		logger.LogError("Failed to apply new OS. Output: %s", output)
 		return err
 	}
 
