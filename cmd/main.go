@@ -37,7 +37,7 @@ var writeCmd = &cobra.Command{
 	Use:   "write [update-image-path] [checksum]",
 	Short: "Write rootfs partition",
 	Args:  cobra.ExactArgs(2),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		updateImagePath := args[0]
 		checksumValue := args[1]
 		devMode, _ := cmd.Flags().GetBool("dev")
@@ -47,56 +47,62 @@ var writeCmd = &cobra.Command{
 		err := write.WritePartition(updateImagePath, checksumValue, devMode)
 		if err != nil {
 			logger.LogError("Error writing partition: %v", err)
+			return err
 		}
+		return nil
 	},
 }
 
 var applyCmd = &cobra.Command{
 	Use:   "apply",
 	Short: "Apply updated image as next boot",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		err := apply.ApplyChange()
 		if err != nil {
 			logger.LogError("Error applying new OS: %v", err)
-			return
+			return err
 		}
+		return nil
 	},
 }
 
 var commitCmd = &cobra.Command{
 	Use:   "commit",
 	Short: "Commit updated image as default boot",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		err := commit.CommitChange()
 		if err != nil {
 			logger.LogError("Error committing new OS: %v", err)
-			return
+			return err
 		}
+		return nil
 	},
 }
 
 var rollbackCmd = &cobra.Command{
 	Use:   "rollback",
 	Short: "Restore to previous boot",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		err := rollback.RollbackChange()
 		if err != nil {
 			logger.LogError("Error rolling back to previous boot: %v", err)
-			return
+			return err
 		}
+		return nil
 	},
 }
 
 var displayCmd = &cobra.Command{
 	Use:   "display",
 	Short: "Display current active partition",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		logger.LogInfo("Displaying current active partition...")
 		_, err := core.GetActivePartition()
 		if err != nil {
 			logger.LogError("Error getting current active partition: %v", err)
-			return
+			return err
 		}
+		return nil
 	},
 }
 

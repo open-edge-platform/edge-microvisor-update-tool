@@ -2,9 +2,11 @@ package main
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
 )
 
 func executeCommand(cmd *cobra.Command, args ...string) (output string, err error) {
@@ -17,62 +19,38 @@ func executeCommand(cmd *cobra.Command, args ...string) (output string, err erro
 	return buf.String(), err
 }
 
-func TestWriteCmd(t *testing.T) {
-	output, err := executeCommand(writeCmd, "path/to/image", "checksum123")
+func assertCommandFailure(t *testing.T, cmd string, args ...string) {
+	t.Helper()
+	output, err := executeCommand(rootCmd, append([]string{cmd}, args...)...)
 	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-
-	expected := "" // Replace with the actual expected output
-	if output != expected {
-		t.Errorf("Expected %q, got %q", expected, output)
+		assert.Contains(t, output, "Error", "Expected 'Error' in output, but not found")
+	} else {
+		t.Fatalf("Expected failure for '%s', but got success\nOutput: %s", cmd, output)
 	}
 }
 
-func TestApplyCmd(t *testing.T) {
-	output, err := executeCommand(applyCmd)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-
-	expected := "" // Replace with the actual expected output
-	if output != expected {
-		t.Errorf("Expected %q, got %q", expected, output)
-	}
+func TestWriteCmdFailure(t *testing.T) {
+	assertCommandFailure(t, "write", "../internal/testData/valid.raw.gz", "fbdd36650f73f3afdbf34b9c887e192a3c20d1591741cb79a253075ac192dbba")
 }
 
-func TestCommitCmd(t *testing.T) {
-	output, err := executeCommand(commitCmd)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-
-	expected := "" // Replace with the actual expected output
-	if output != expected {
-		t.Errorf("Expected %q, got %q", expected, output)
-	}
+func TestApplyCmdFailure(t *testing.T) {
+	assertCommandFailure(t, "apply")
 }
 
-func TestRollbackCmd(t *testing.T) {
-	output, err := executeCommand(rollbackCmd)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
+func TestCommitCmdFailure(t *testing.T) {
+	assertCommandFailure(t, "commit")
+}
 
-	expected := "" // Replace with the actual expected output
-	if output != expected {
-		t.Errorf("Expected %q, got %q", expected, output)
-	}
+func TestRollbackCmdFailure(t *testing.T) {
+	assertCommandFailure(t, "rollback")
 }
 
 func TestDisplayCmd(t *testing.T) {
-	output, err := executeCommand(displayCmd)
+	output, err := executeCommand(rootCmd, "display")
 	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
+		t.Fatalf("displayCmd failed: %v", err)
 	}
-
-	expected := ""
-	if output != expected {
-		t.Errorf("Expected %q, got %q", expected, output)
+	if strings.TrimSpace(output) != "" {
+		t.Errorf("Expected empty output for success, got:\n%s", output)
 	}
 }
