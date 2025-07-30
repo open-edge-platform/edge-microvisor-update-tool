@@ -2,6 +2,7 @@ package rollback
 
 import (
 	"fmt"
+	"os"
 
 	boot "os.update.tool/pkg/bootconfig"
 	"os.update.tool/pkg/exec"
@@ -35,6 +36,13 @@ func RollbackChange() error {
 	// Log the active and previous UKI
 	logger.LogInfo("Active UKI: %s", activeUKI)
 	logger.LogInfo("Previous UKI: %s", prevUKI)
+
+	// Check if the previous UKI file exists
+	efiPath := fmt.Sprintf("/boot/efi/EFI/Linux/%s", prevUKI)
+	if _, err := os.Stat(efiPath); os.IsNotExist(err) {
+		logger.LogError("Failed to restore previous OS: %s does not exist", efiPath)
+		return fmt.Errorf("failed to restore previous OS: %s does not exist", efiPath)
+	}
 
 	// Execute the bootctl command to set the default boot entry
 	output, err := executeCommandFunc("bootctl", "set-default", prevUKI)
