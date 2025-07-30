@@ -55,10 +55,9 @@ flag_dev=false
 
 # Function to display help
 display_help() {
-    echo "Usage: sudo os-update-tool.sh [-r] [-v] [-a] [-c] [-w] [-u string] [-s string] [-h] [--debug]"
+    echo "Usage: sudo os-update-tool.sh [-v] [-a] [-c] [-w] [-u string] [-s string] [-h] [--debug]"
     echo
     echo "Options:"
-    echo "  -r      Restore to previous boot."
     echo "  -v      Display current active partition."
     echo "  -a      Apply updated image as next boot."
     echo "  -c      Commit Updated image as default boot."
