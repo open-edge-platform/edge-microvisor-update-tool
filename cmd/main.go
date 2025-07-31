@@ -107,7 +107,6 @@ func init() {
 	rootCmd.AddCommand(writeCmd)
 	rootCmd.AddCommand(applyCmd)
 	rootCmd.AddCommand(commitCmd)
-	//rootCmd.AddCommand(rollbackCmd)
 	rootCmd.AddCommand(displayCmd)
 
 	writeCmd.Flags().Bool("dev", false, "Enable development mode")

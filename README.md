@@ -51,11 +51,6 @@ Commit updated image as default boot:
 go run cmd/main.go commit
 ```
 
-Rollback to the previous boot.
-```
-go run cmd/main.go rollback
-```
-
 Display current active partition:
 ```
 go run cmd/main.go display
