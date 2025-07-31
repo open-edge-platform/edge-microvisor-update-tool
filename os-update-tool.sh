@@ -36,8 +36,6 @@ if [ -d "$SRC_DIR" ]; then
 fi
 
 # Flags for handling options
-# restore previous boot
-flag_r=false
 # Active partition version
 flag_v=false
 # apply
@@ -55,10 +53,9 @@ flag_dev=false
 
 # Function to display help
 display_help() {
-    echo "Usage: sudo os-update-tool.sh [-r] [-v] [-a] [-c] [-w] [-u string] [-s string] [-h] [--debug]"
+    echo "Usage: sudo os-update-tool.sh [-v] [-a] [-c] [-w] [-u string] [-s string] [-h] [--debug]"
     echo
     echo "Options:"
-    echo "  -r      Restore to previous boot."
     echo "  -v      Display current active partition."
     echo "  -a      Apply updated image as next boot."
     echo "  -c      Commit Updated image as default boot."
@@ -83,9 +80,6 @@ fi
 # parse flag
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
-        -r )
-            flag_r=true
-            ;;
         -v )
             flag_v=true
             ;;
@@ -346,29 +340,6 @@ if $flag_c; then
     check_error "Failed to commit update OS." 4
 
     log_info "Commit update successfull."
-fi
-
-# restore previous backup
-if $flag_r; then
-    log_debug "Cancel update and restore to previous boot."
-
-    # fde on
-    if $flag_fde; then
-        check_real_active_partition
-    elif $flag_dmverity; then
-        check_dm_active_partition
-    else
-        check_active_partition
-    fi
-    active_boot="$FNRETURN"
-    get_active_uki "$active_boot" "$flag_fde" "$flag_dmverity"
-    active_efi="$FNRETURN"
-    log_debug "Active Partition: $active_boot"
-    log_debug "Active UKI: $active_efi"
-    restore "$active_efi"
-    check_error "Failed to restore boot." 4
-
-    log_info "Restore successfull."
 fi
 
 # Exit the script

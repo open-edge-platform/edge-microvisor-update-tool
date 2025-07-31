@@ -24,12 +24,11 @@ sudo ./os-update-tool.sh -h
 **output:**
 
 ```bash
-os-update-tool ver-1.7
+os-update-tool ver-2.9
 
-Usage: sudo os-update-tool.sh [-r] [-v] [-a] [-c] [-w] [-u string] [-s string] [-h] [--debug]
+Usage: sudo os-update-tool.sh [-v] [-a] [-c] [-w] [-u string] [-s string] [-h] [--debug]
 
 Options:
-  -r      Restore to previous boot.
   -v      Display current active partition.
   -a      Apply updated image as next boot.
   -c      Commit Updated image as default boot.
@@ -71,31 +70,16 @@ sudo ./os-update-tool.sh -c
 ___
 
 ## Additional functionality
-
-### 1. Restore previous boot
-
-```bash
-sudo ./os-update-tool.sh -r
-```
-
-### 2. Display current boot partition and its image UUID
+### 1. Display current boot partition and its image UUID
 
 ```bash
 sudo ./os-update-tool.sh -v
 ```
 
-### 3. Enables Debug by adding "--debug"
+### 2. Enables Debug by adding "--debug"
 
 ```bash
 sudo ./os-update-tool.sh -v --debug
-```
-
-### 4. Enable Developer mode by adding "--dev"
-
-Currently, dev mode will auto create user for the newly installed OS.
-
-```bash
-sudo ./os-update-tool.sh -w -u /mnt/tiber-readonly-1.0.20240920.1734.raw.xz -s e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --dev
 ```
 
 ## Getting Help
