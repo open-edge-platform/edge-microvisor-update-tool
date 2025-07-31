@@ -30,8 +30,7 @@ The application provides several commands to manage the OS update tool:
 
 - write [update-image-path] [checksum]: Write rootfs partition with the specified update image path and checksum.    
 - apply: Apply the updated image as the next boot.    
-- commit: Commit the updated image as the default boot.    
-- rollback: Rollback to the previous boot.    
+- commit: Commit the updated image as the default boot.
 - display: Display the current active partition.    
 
 Make sure to review and understand the functionality implemented in `main.go` to effectively run and modify the application.   
@@ -49,11 +48,6 @@ go run cmd/main.go apply
 Commit updated image as default boot:
 ```
 go run cmd/main.go commit
-```
-
-Rollback to the previous boot.
-```
-go run cmd/main.go rollback
 ```
 
 Display current active partition:

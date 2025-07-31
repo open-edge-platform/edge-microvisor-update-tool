@@ -29,7 +29,7 @@ func printVersion() {
 
 var rootCmd = &cobra.Command{
 	Use:   "os-update-tool",
-	Short: "os-update-tool ver-3.0",
+	Short: fmt.Sprintf("os-update-tool %s", Version),
 	Long:  `Usage: sudo os-update-tool [command] [flags]`,
 }
 
@@ -107,7 +107,6 @@ func init() {
 	rootCmd.AddCommand(writeCmd)
 	rootCmd.AddCommand(applyCmd)
 	rootCmd.AddCommand(commitCmd)
-	rootCmd.AddCommand(rollbackCmd)
 	rootCmd.AddCommand(displayCmd)
 
 	writeCmd.Flags().Bool("dev", false, "Enable development mode")

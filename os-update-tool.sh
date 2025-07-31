@@ -21,8 +21,6 @@ fi
 trap 'flock -u "$lfd"' EXIT
 
 # Flags for handling options
-# restore previous boot
-flag_r=false
 # Active partition version
 flag_v=false
 # apply
@@ -44,10 +42,9 @@ osabupdate="/usr/bin/os-ab-update"
 
 # Function to display help
 display_help() {
-    echo "Usage: sudo os-update-tool.sh [-r] [-v] [-a] [-c] [-w] [-u string] [-s string] [-h] [--debug]"
+    echo "Usage: sudo os-update-tool.sh [-v] [-a] [-c] [-w] [-u string] [-s string] [-h] [--debug]"
     echo
     echo "Options:"
-    echo "  -r      Restore to previous boot."
     echo "  -v      Display current active partition."
     echo "  -a      Apply updated image as next boot."
     echo "  -c      Commit Updated image as default boot."
@@ -72,9 +69,6 @@ fi
 # parse flag
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
-        -r )
-            flag_r=true
-            ;;
         -v )
             flag_v=true
             ;;
@@ -161,11 +155,6 @@ fi
 # commit update
 if $flag_c; then
     $osabupdate commit
-fi
-
-# restore previous backup
-if $flag_r; then
-    $osabupdate rollback
 fi
 
 # Exit the script
