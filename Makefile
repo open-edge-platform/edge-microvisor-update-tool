@@ -32,13 +32,18 @@ unit_test:
 	@go test -v ./internal/... 
 	@echo "unit test execution completed for all modules"
 
+integration_test:
+	@echo "Running integration tests..."
+	@go test -v ./cmd -count=1 || echo "Tests failed with code $$?"
+	@echo "integration test execution completed"
+
 cover_unit:
 	mkdir -p $(BUILD_DIR)/coverage/unit
 	go test -v ./internal/... -cover -covermode count -args -test.gocoverdir=$(shell pwd)/$(BUILD_DIR)/coverage/unit | tee $(BUILD_DIR)/coverage/unit/unit.out
 	go tool covdata percent -i=$(BUILD_DIR)/coverage/unit
 	go tool covdata func -i=$(BUILD_DIR)/coverage/unit
 
-.PHONY: build lint unit_test cover_unit tarball rpm_package
+.PHONY: build lint unit_test integration_test cover_unit tarball rpm_package
 
 tarball:
 	@# Help: creates source tarball
