@@ -19,6 +19,7 @@ install:
 	@echo "Installing to $(BINDIR)"
 	mkdir -p $(BINDIR)
 	install -p -m 0770 $(BUILD_DIR)/$(APP_NAME) $(BINDIR)/$(APP_NAME)
+	install -p -m 0770 os-update-tool.sh $(BINDIR)/os-update-tool.sh
 	@echo "Installation completed. Binary is located at /usr/bin/$(APP_NAME)"
 
 lint:
@@ -51,7 +52,7 @@ tarball:
 
 	mkdir -p $(TARBALL_DIR)
 	mkdir -p rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS
-	cp -r cmd/ internal/ pkg/ Makefile VERSION go.mod go.sum $(TARBALL_DIR)
+	cp -r cmd/ internal/ pkg/ Makefile VERSION go.mod go.sum os-update-tool.sh $(TARBALL_DIR)
 	sed -i "s#COMMIT := .*#COMMIT := $(COMMIT)#" $(TARBALL_DIR)/Makefile
 	cd $(TARBALL_DIR) && go mod tidy && go mod vendor
 	tar -zcf $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION).tar.gz --directory=$(BUILD_DIR) $(APP_NAME)-$(PKG_VERSION)

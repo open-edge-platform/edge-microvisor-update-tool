@@ -25,6 +25,7 @@ make build GO_MOD=vendor
 %make_install
 
 %files
+/usr/bin/os-update-tool.sh
 /usr/bin/%{name}
 
 %changelog

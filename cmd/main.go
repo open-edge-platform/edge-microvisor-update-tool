@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	apply "os.update.tool/internal/apply"
 	commit "os.update.tool/internal/commit"
-	rollback "os.update.tool/internal/rollback"
 	write "os.update.tool/internal/write"
 	core "os.update.tool/pkg/core"
 	"os.update.tool/pkg/logger"
@@ -73,19 +72,6 @@ var commitCmd = &cobra.Command{
 		err := commit.CommitChange()
 		if err != nil {
 			logger.LogError("Error committing new OS: %v", err)
-			return err
-		}
-		return nil
-	},
-}
-
-var rollbackCmd = &cobra.Command{
-	Use:   "rollback",
-	Short: "Restore to previous boot",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := rollback.RollbackChange()
-		if err != nil {
-			logger.LogError("Error rolling back to previous boot: %v", err)
 			return err
 		}
 		return nil
