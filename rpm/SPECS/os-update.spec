@@ -1,6 +1,6 @@
 Summary:        OS Update Tool for OS A and B swapping for image based update
 Name:           os-update
-Version:        2.9
+Version:        3.0
 Release:        1%{?dist}
 License:        LicenseRef-Intel
 Vendor:         Intel Corporation
@@ -8,6 +8,8 @@ Distribution:   Edge Microvisor Toolkit
 Group:          System Environment/Base
 URL:            https://github.com/open-edge-platform/edge-microvisor-update-tool
 Source0:        os-update-%{version}.tar.gz
+%global _build_id_links none
+BuildRequires:  golang
 
 %description
 Purpose of this module is to enable OS  A and B swapping for Day 2 Operation. Details on the
@@ -16,13 +18,16 @@ architecture can be found in the ADR.
 %prep
 %setup -q
 
+%build
+make build GO_MOD=vendor
+
 %install
 # Install the script files under /usr/bin
 %make_install
 
 %files
-%{_bindir}/os-update-tool.sh
-%{_bindir}/os-update-modules/*
+/usr/bin/os-update-tool.sh
+/usr/bin/%{name}
 
 %changelog
 * Tue Jul 30 2025 Suh Haw Teoh <suh.haw.teoh@intel.com> - 2.9-1

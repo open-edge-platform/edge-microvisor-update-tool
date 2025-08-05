@@ -1,33 +1,49 @@
-# SPDX-FileCopyrightText: (C) 2023 Intel Corporation
-# SPDX-License-Identifier: LicenseRef-Intel
-
-NAME ?= os-update
-BUILD_DIR ?= build/artifacts
-SCRIPTS_DIR := ./ci_scripts
+# Variables
+APP_NAME = os-update
+SRC_DIR = ./cmd
+BUILD_DIR = ./build
+COVERAGE_DIR = ./coverage
 TOPDIR = $(shell pwd)/rpm
-PACKAGE_BUILD_DIR ?= $(BUILD_DIR)/package
-PKG_VERSION := $(shell if grep -q dev os-update-modules/VERSION; then echo $$(cat os-update-modules/VERSION)-$$(git rev-parse --short HEAD); else cat os-update-modules/VERSION; fi)
-VERSION := $(shell cat os-update-modules/VERSION)
-COMMIT := $(shell git rev-parse --short HEAD)
-ifneq (,$(findstring dev,$(VERSION)))
-	PKG_VERSION = $(VERSION)-$(COMMIT)
-else
-	PKG_VERSION = $(VERSION)
-endif
-TARBALL_DIR := $(BUILD_DIR)/$(NAME)-$(PKG_VERSION)
-# Define variables for paths
+PKG_VERSION := $(shell cat VERSION)
+TARBALL_DIR := $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION)
 BINDIR = $(DESTDIR)/usr/bin
-MODULEDIR = $(BINDIR)/os-update-modules
 
-.PHONY: all build clean help lint list package test tarball
+# Commands
+build:
+	@echo "Building the application..."
+	@mkdir -p $(BUILD_DIR)
+	@go build -ldflags "-X main.Version=$(PKG_VERSION)" -o $(BUILD_DIR)/$(APP_NAME) $(SRC_DIR)
+	@echo "Build completed. Binary is located at $(BUILD_DIR)/$(APP_NAME)"
 
-all: tarball
-	@# Help: runs build, lint, test & package targets
+install:
+	@echo "Installing to $(BINDIR)"
+	mkdir -p $(BINDIR)
+	install -p -m 0770 $(BUILD_DIR)/$(APP_NAME) $(BINDIR)/$(APP_NAME)
+	install -p -m 0770 os-update-tool.sh $(BINDIR)/os-update-tool.sh
+	@echo "Installation completed. Binary is located at /usr/bin/$(APP_NAME)"
 
-clean:
-	@# Help: deletes build directory
-	rm -rf $(BUILD_DIR)/*
-	rm -rf rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS
+lint:
+	@echo "Running Go linter..."
+	@golangci-lint run ./... --config .golangci.yml --skip-dirs $(shell go env GOPATH)
+	@echo "Linting completed."
+
+unit_test:
+	@echo "Running unit tests..."
+	@go test -v ./internal/... 
+	@echo "unit test execution completed for all modules"
+
+integration_test:
+	@echo "Running integration tests..."
+	@go test -v ./cmd -count=1 || echo "Tests failed with code $$?"
+	@echo "integration test execution completed"
+
+cover_unit:
+	mkdir -p $(BUILD_DIR)/coverage/unit
+	go test -v ./internal/... -cover -covermode count -args -test.gocoverdir=$(shell pwd)/$(BUILD_DIR)/coverage/unit | tee $(BUILD_DIR)/coverage/unit/unit.out
+	go tool covdata percent -i=$(BUILD_DIR)/coverage/unit
+	go tool covdata func -i=$(BUILD_DIR)/coverage/unit
+
+.PHONY: build lint unit_test integration_test cover_unit tarball rpm_package
 
 tarball:
 	@# Help: creates source tarball
@@ -35,40 +51,19 @@ tarball:
 
 	mkdir -p $(TARBALL_DIR)
 	mkdir -p rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS
-	cp -r os-update-modules/ Makefile os-update-tool.sh $(TARBALL_DIR)
+	cp -r cmd/ internal/ pkg/ Makefile VERSION go.mod go.sum os-update-tool.sh $(TARBALL_DIR)
 	sed -i "s#COMMIT := .*#COMMIT := $(COMMIT)#" $(TARBALL_DIR)/Makefile
-	tar -zcf $(BUILD_DIR)/$(NAME)-$(PKG_VERSION).tar.gz --directory=$(BUILD_DIR) $(NAME)-$(PKG_VERSION)
-	cp $(BUILD_DIR)/$(NAME)-$(PKG_VERSION).tar.gz ./rpm/SOURCES
+	cd $(TARBALL_DIR) && go mod tidy && go mod vendor
+	tar -zcf $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION).tar.gz --directory=$(BUILD_DIR) $(APP_NAME)-$(PKG_VERSION)
+	cp $(BUILD_DIR)/$(APP_NAME)-$(PKG_VERSION).tar.gz ./rpm/SOURCES
 
 	@echo "---END MAKEFILE TARBALL---"
 
 rpm_package:
-	rpmbuild -ba rpm/SPECS/$(NAME).spec --define "_topdir $(TOPDIR)"
+	rpmbuild -ba rpm/SPECS/$(APP_NAME).spec --define "_topdir $(TOPDIR)"
 
-install:
-	@echo "Installing to $(BINDIR) and $(MODULEDIR)"
-	# Create directories
-	mkdir -p $(MODULEDIR)
+clean:
+	@# Help: deletes build directory
+	rm -rf $(BUILD_DIR)/*
+	rm -rf rpm/BUILDROOT rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS
 
-	# Install the script files
-	install -p -m 0770 os-update-tool.sh $(BINDIR)/os-update-tool.sh
-	install -p -m 0660 os-update-modules/VERSION $(MODULEDIR)/VERSION
-	install -p -m 0660 os-update-modules/common.sh $(MODULEDIR)/common.sh
-	install -p -m 0660 os-update-modules/os-update-tool.config $(MODULEDIR)/os-update-tool.config
-	install -p -m 0660 os-update-modules/get_image.sh $(MODULEDIR)/get_image.sh
-	install -p -m 0660 os-update-modules/log.sh $(MODULEDIR)/log.sh
-	install -p -m 0660 os-update-modules/OSutil.sh $(MODULEDIR)/OSutil.sh
-	install -p -m 0660 os-update-modules/systemd_boot_config.sh $(MODULEDIR)/systemd_boot_config.sh
-	install -p -m 0660 os-update-modules/writes.sh $(MODULEDIR)/writes.sh
-
-list: help
-	@# Help: displays make targets
-
-help:
-	@printf "%-20s %s\n" "Target" "Description"
-	@printf "%-20s %s\n" "------" "-----------"
-	@make -pqR : 2>/dev/null \
-		| awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' \
-		| sort \
-		| egrep -v -e '^[^[:alnum:]]' -e '^$@$$' \
-		| xargs -I _ sh -c 'printf "%-20s " _; make _ -nB | (grep -i "^# Help:" || echo "") | tail -1 | sed "s/^# Help: //g"'
