@@ -38,7 +38,7 @@ flag_dev=false
 
 IMG_SOURCE=""
 IMG_SOURCE_SHA=""
-osabupdate="/usr/bin/os-ab-update"
+osabupdate="/usr/bin/os-update"
 
 # Function to display help
 display_help() {
@@ -55,10 +55,6 @@ display_help() {
     echo "  --debug Executes with debug log."
     exit 1
 }
-
-# print current version 
-echo "os-update-tool ver-$(cat "$SRC_DIR"/VERSION)"
-echo ""
 
 # no parameter
 if [[ "$#" -eq 0 ]]; then
