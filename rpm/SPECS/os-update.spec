@@ -4,11 +4,12 @@ Version:        3.0
 Release:        1%{?dist}
 License:        LicenseRef-Intel
 Vendor:         Intel Corporation
-Distribution:   Tiber
+Distribution:   Edge Microvisor Toolkit
 Group:          System Environment/Base
-URL:            https://github.com/intel-innersource/os.linux.tiberos.ab-update
+URL:            https://github.com/open-edge-platform/edge-microvisor-update-tool
 Source0:        os-update-%{version}.tar.gz
 %global _build_id_links none
+BuildRequires:  golang
 
 %description
 Purpose of this module is to enable OS  A and B swapping for Day 2 Operation. Details on the
@@ -29,6 +30,18 @@ make build GO_MOD=vendor
 /usr/bin/%{name}
 
 %changelog
+* Tue Jul 30 2025 Suh Haw Teoh <suh.haw.teoh@intel.com> - 2.9-1
+- Bump version to 2.9
+- Remove restore function
+
+* Tue Jul 15 2025 Samuel Taripin <samuel.taripin@intel.com> - 2.8-1
+- Bump version to 2.8
+- Remove bootctl remove logic
+
+* Mon Jul 07 2025 Suh Haw Teoh <suh.haw.teoh@intel.com> - 2.7-1
+- Bump version to 2.7
+- Improved wording
+
 * Thu Apr 10 2025 Suh Haw Teoh <suh.haw.teoh@intel.com> - 2.6-1
 - Bump version to 2.6
 - Add filesystem check before change UUID

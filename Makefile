@@ -27,7 +27,6 @@ lint:
 	@golangci-lint run ./... --config .golangci.yml --skip-dirs $(shell go env GOPATH)
 	@echo "Linting completed."
 
-# Need to modify for all folders in internal folder
 unit_test:
 	@echo "Running unit tests..."
 	@go test -v ./internal/... 
@@ -67,3 +66,4 @@ clean:
 	@# Help: deletes build directory
 	rm -rf $(BUILD_DIR)/*
 	rm -rf rpm/BUILDROOT rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SRPMS
+

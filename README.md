@@ -55,6 +55,21 @@ Display current active partition:
 go run cmd/main.go display
 ```
 
+## Getting Help
+
+If you encounter bugs, have feature requests, or need assistance,
+[file a GitHub Issue](https://github.com/open-edge-platform/edge-microvisor-update-tool/issues).
+
+Before submitting a new report, check the existing issues to see if a similar one has not
+been filed already. If no matching issue is found, feel free to file the issue as described
+in the [contribution guide](./CONTRIBUTING.md).
+
+For security-related concerns, please refer to [SECURITY.md](./SECURITY.md).
+
+## License Information
+
+Edge Microvisor Update Tool is open source and licensed under the MIT License.
+See the [LICENSE](./LICENSE) file for more details.
 
 ## Contributing
 
