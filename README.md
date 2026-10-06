@@ -103,3 +103,5 @@ See the [LICENSE](./LICENSE) file for more details.
 As an open-source project, Edge Microvisor Update Tool always looks for
 community-driven improvements. If you are interested in making the product even
 better, see how you can help in the [contribution guide](./CONTRIBUTING.md).
+
+_Last updated: 2026-10-06 (MYT, UTC+8)_
