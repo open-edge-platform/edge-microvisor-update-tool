@@ -20,7 +20,7 @@ jobs:
       - name: Update Package Manager and Install Required Tools
         run: |
           apt-get update
-          apt-get install -y sudo fdisk cryptsetup systemd-boot
+          apt-get install -y sudo fdisk cryptsetup systemd-boot e2fsprogs
           if ! command -v sfdisk > /dev/null; then
             echo "sfdisk is not found. Installation failed."
             exit 1
@@ -31,6 +31,10 @@ jobs:
           fi
           if ! command -v bootctl > /dev/null; then
             echo "bootctl is not found. Installation failed."
+            exit 1
+          fi
+          if ! command -v tune2fs > /dev/null; then
+            echo "tune2fs is not found. Installation failed."
             exit 1
           fi
 
